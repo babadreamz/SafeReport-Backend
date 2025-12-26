@@ -1,0 +1,47 @@
+services:
+  postgres-safe-report:
+    image: 'postgres:15-alpine'
+    container_name: 'postgres-safe-report-db'
+    environment:
+      - POSTGRES_DB=${DB_NAME}
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+      - POSTGRES_USER=${DB_USERNAME}
+    ports:
+      - "${DB_EXTERNAL_PORT}:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U ${DB_USERNAME} -d ${DB_NAME}" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  safe-report-backend:
+    build: .
+    container_name: 'safe-report-backend'
+    ports:
+      - "${APP_PORT}:${APP_PORT}"
+    depends_on:
+      postgres-safe-report:
+        condition: service_healthy
+      redis:
+        condition: service_started
+
+    environment:
+      APP_PORT: ${APP_PORT}
+      DB_HOST: postgres-safe-report
+      DB_PORT: 5432
+      DB_NAME: ${DB_NAME}
+      DB_USERNAME: ${DB_USERNAME}
+      DB_PASSWORD: ${DB_PASSWORD}
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+
+  redis:
+    image: 'redis:alpine'
+    container_name: 'redis-safe-report'
+    ports:
+      - "${REDIS_PORT}:6379"
+
+volumes:
+  postgres-data:
