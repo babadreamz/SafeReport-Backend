@@ -1,9 +1,6 @@
 package africa.semicolon.safereportbackend.data.models;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.Data;
 
 @Data
@@ -12,7 +9,9 @@ public class MediaAttachment {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
-    private String reportId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "report_id")
+    private Report report;
     private String fileUrl;
     private String mediaType;
     private String hash;
