@@ -5,6 +5,6 @@ import africa.semicolon.safereportbackend.dtos.requests.ReportRequest;
 import africa.semicolon.safereportbackend.dtos.responses.ReportResponse;
 
 public interface ReportServices {
-    ReportResponse submitReport(ReportRequest request);
+    ReportResponse submitReport(String deviceSignature, ReportRequest request);
     ReportStatus checkReportStatus(String reportId);
 }

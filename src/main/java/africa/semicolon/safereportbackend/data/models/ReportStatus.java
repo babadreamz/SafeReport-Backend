@@ -1,5 +1,9 @@
 package africa.semicolon.safereportbackend.data.models;
 
 public enum ReportStatus {
-    PENDING,VERIFIED,DISPATCHED,RESOLVED
+    PENDING,
+    IN_REVIEW,
+    VERIFIED,
+    FALSE_ALARM,
+    RESOLVED
 }
