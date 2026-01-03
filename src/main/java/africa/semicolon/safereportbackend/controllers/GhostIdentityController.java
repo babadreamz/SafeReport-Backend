@@ -17,7 +17,7 @@ public class GhostIdentityController {
 
     @PostMapping("/create")
     public ResponseEntity<GhostReporterResponse> createGhostIdentity(
-            @RequestHeader(value = "X-Device-Signature", required = true) String deviceSignature
+            @RequestHeader(value = "X-Device-Signature") String deviceSignature
     ){
         GhostReporterResponse response = ghostIdentityServices.createIdentity(deviceSignature);
         return new ResponseEntity<>(response, HttpStatus.CREATED);
@@ -25,7 +25,7 @@ public class GhostIdentityController {
     @PutMapping("/recover")
     public ResponseEntity<GhostReporterDto> recoverAccount(
             @RequestBody RecoveryRequest recoveryRequest,
-            @RequestHeader(value = "X-Device-Signature", required = true) String newDeviceSignature){
+            @RequestHeader(value = "X-Device-Signature") String newDeviceSignature){
         GhostReporterDto ghostReporterDto = ghostIdentityServices.recoverAccount(recoveryRequest, newDeviceSignature);
         return ResponseEntity.ok(ghostReporterDto);
     }
