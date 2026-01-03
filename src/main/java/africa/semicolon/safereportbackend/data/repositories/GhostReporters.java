@@ -7,4 +7,6 @@ import java.util.Optional;
 
 public interface GhostReporters extends JpaRepository<GhostReporter,String> {
     Optional<GhostReporter> findByRecoveryPhraseHash(String recoveryPhraseHash);
+
+    Optional<GhostReporter> findByDeviceSignatureHash(String deviceSignatureHash);
 }

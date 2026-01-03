@@ -5,9 +5,12 @@ import io.lettuce.core.RedisException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.Base64;
 import java.util.concurrent.TimeUnit;
 
@@ -46,6 +49,18 @@ public class AnonymityServicesImpl implements AnonymityServices {
             return Base64.getEncoder().encodeToString(hash);
         }catch (Exception e){
             throw new HashingFailedException("Device Signature Hashing Failed");
+        }
+    }
+    @Override
+    public String calculateFileHash(MultipartFile file) {
+        try {
+            MessageDigest digest = MessageDigest.getInstance("SHA-256");
+            byte[] hash = digest.digest(file.getBytes());
+            return Base64.getEncoder().encodeToString(hash);
+        } catch (NoSuchAlgorithmException e) {
+            throw new RuntimeException("Hashing algorithm not available", e);
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to read file bytes for hashing", e);
         }
     }
 
