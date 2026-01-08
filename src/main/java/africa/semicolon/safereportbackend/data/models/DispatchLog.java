@@ -19,4 +19,5 @@ public class DispatchLog {
     private String actionTaken;
     private LocalDateTime arrivalTime;
     private String outcome;
+    private boolean isDeleted;
 }

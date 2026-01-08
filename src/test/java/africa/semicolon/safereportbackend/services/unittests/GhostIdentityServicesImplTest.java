@@ -1,9 +1,10 @@
-package africa.semicolon.safereportbackend.services;
+package africa.semicolon.safereportbackend.services.unittests;
 
 import africa.semicolon.safereportbackend.data.models.GhostReporter;
 import africa.semicolon.safereportbackend.dtos.modeldtos.GhostReporterDto;
 import africa.semicolon.safereportbackend.dtos.requests.RecoveryRequest;
 import africa.semicolon.safereportbackend.dtos.responses.GhostReporterResponse;
+import africa.semicolon.safereportbackend.services.GhostIdentityServicesImpl;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -23,7 +24,7 @@ class GhostIdentityServicesImplTest {
 
     @Test
     void testThatIdentityCanBeCreated() {
-        String deviceSignature = "testDeviceSignature";
+        String deviceSignature = "testDeviceSignature1";
         GhostReporterResponse response = ghostIdentityServices.createIdentity(deviceSignature);
         assertNotNull(response);
         Optional<GhostReporter> foundReporter = ghostIdentityServices.getGhostReporters().findById(response.getId());
@@ -31,7 +32,7 @@ class GhostIdentityServicesImplTest {
     }
     @Test
     void testThatAccountCanBeRecovered(){
-        String deviceSignature = "testDeviceSignature";
+        String deviceSignature = "testDeviceSignature1";
         GhostReporterResponse response = ghostIdentityServices.createIdentity(deviceSignature);
         assertNotNull(response);
         Optional<GhostReporter> foundReporter = ghostIdentityServices.getGhostReporters().findById(response.getId());

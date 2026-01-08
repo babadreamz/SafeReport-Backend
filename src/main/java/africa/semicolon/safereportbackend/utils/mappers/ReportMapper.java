@@ -29,6 +29,7 @@ public class ReportMapper {
         response.setAssignedPriority(report.getPriorityLevel());
         response.setTimeReceived(report.getCreatedTimestamp());
         response.setResolvedAddress(report.getStreet() + ", " + report.getLga());
+        response.setResponderUnitId(report.getResponderUnitId());
         response.setMessage("Report received successfully.");
         return response;
     }

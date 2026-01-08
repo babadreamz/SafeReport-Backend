@@ -14,4 +14,5 @@ public class HeatMapAggregate {
     private String id;
     private int incidentCount24hrs;
     private Long incidentCount7days;
+    private boolean isDeleted;
 }

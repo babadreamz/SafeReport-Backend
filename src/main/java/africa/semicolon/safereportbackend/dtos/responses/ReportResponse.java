@@ -18,4 +18,5 @@ public class ReportResponse {
     private LocalDateTime timeReceived;
     private String message;
     private String ghostReporterId;
+    private String responderUnitId;
 }

@@ -30,8 +30,10 @@ public class Report {
     private String street;
     private String lga;
     private String state;
+    private String agencyId;
     private String responderUnitId;
     private String ghostReporterId;
     @OneToMany(mappedBy = "report", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<MediaAttachment> mediaAttachments = new ArrayList<>();
+    private boolean isDeleted;
 }

@@ -19,6 +19,8 @@ public class GlobalExceptionHandler {
             status = HttpStatus.TOO_MANY_REQUESTS;
         } else if (exception.getMessage().contains("not found")) {
             status = HttpStatus.NOT_FOUND;
+        } else if (exception.getMessage().contains("Access Denied")) {
+            status = HttpStatus.FORBIDDEN;
         }
         errorResponse.put("timestamp", java.time.LocalDateTime.now());
         errorResponse.put("error", status.getReasonPhrase());
