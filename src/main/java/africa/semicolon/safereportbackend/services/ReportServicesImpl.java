@@ -1,15 +1,11 @@
 package africa.semicolon.safereportbackend.services;
 
 import africa.semicolon.safereportbackend.data.models.*;
-import africa.semicolon.safereportbackend.data.repositories.GhostReporters;
-import africa.semicolon.safereportbackend.data.repositories.MediaAttachments;
-import africa.semicolon.safereportbackend.data.repositories.Reports;
+import africa.semicolon.safereportbackend.data.repositories.*;
 import africa.semicolon.safereportbackend.dtos.modeldtos.MediaAttachmentDto;
 import africa.semicolon.safereportbackend.dtos.requests.ReportRequest;
 import africa.semicolon.safereportbackend.dtos.responses.ReportResponse;
-import africa.semicolon.safereportbackend.exceptions.GhostReporterNotFoundException;
-import africa.semicolon.safereportbackend.exceptions.ReportNotFoundException;
-import africa.semicolon.safereportbackend.exceptions.SpamReportException;
+import africa.semicolon.safereportbackend.exceptions.*;
 import africa.semicolon.safereportbackend.utils.mappers.MediaAttachmentMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -17,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.time.LocalDateTime;
 import java.util.Map;
 import java.util.Optional;
 
@@ -41,6 +38,12 @@ public class ReportServicesImpl implements ReportServices {
     private final MediaAttachments mediaAttachments;
     @Autowired
     private final MediaAttachmentMapper mediaAttachmentMapper;
+    @Autowired
+    private final ResponderUnits responderUnits;
+    @Autowired
+    private Agencies agencies;
+    @Autowired
+    private ResponderServices responderServices;
 
     @Override
     public ReportResponse submitReport(String deviceSignature, ReportRequest request) {
@@ -50,8 +53,11 @@ public class ReportServicesImpl implements ReportServices {
         }
         GhostReporter reporter = ghostReporters.findByDeviceSignatureHash(hashedDeviceSignature)
                 .orElseThrow(()-> new GhostReporterNotFoundException("Identity not found. Please register first."));
+        Agency agency = agencies.findById(request.getAgencyId()).orElseThrow(()-> new AgencyNotFoundException("Invalid agency id."));
+
         Report report = mapToReport(request);
         report.setGhostReporterId(reporter.getId());
+        report.setAgencyId(agency.getId());
 
         calculatePriorityAndDistance(report, request.isHappeningNow());
 
@@ -64,23 +70,29 @@ public class ReportServicesImpl implements ReportServices {
         }catch (Exception e){
             log.warn("Geocoding failed, proceeding with empty address.");
         }
+        ResponderUnit nearestResponder = findNearestResponder(agency,report.getIncidentLatitude(),report.getIncidentLongitude());
+        if(nearestResponder != null){
+            report.setResponderUnitId(nearestResponder.getId());
+            log.info("Report auto-dispatched to unit: {}", nearestResponder.getUsername());
+            responderServices.invalidateResponderCache(nearestResponder.getId(),"PENDING");
+        }else {
+            log.warn("No responder units available for agency: {}", agency.getName());
+            report.setResponderUnitId(null);
+            report.setReportStatus(ReportStatus.UNASSIGNED);
+        }
         Report savedReport = reports.save(report);
         return mapToResponse(savedReport);
     }
 
     @Override
     public ReportStatus checkReportStatus(String reportId) {
-        Report report = reports.findById(reportId)
-                .orElseThrow(()-> new ReportNotFoundException("Report not found."));
+        Report report = findReportById(reportId);
         return report.getReportStatus();
     }
 
     @Override
     public MediaAttachmentDto attachMediaToReport(String reportId, MultipartFile file) {
-        Report report = reports.findById(reportId)
-                .orElseThrow(()->{log.error("Report not found");
-                         return new ReportNotFoundException("Report not found.");
-                });
+        Report report = findReportById(reportId);
         String fileUrl;
         String fileHash = anonymityServices.calculateFileHash(file);
         Optional<MediaAttachment> existingFile = mediaAttachments.findFirstByHash(fileHash);
@@ -96,9 +108,40 @@ public class ReportServicesImpl implements ReportServices {
         mediaAttachment.setFileUrl(fileUrl);
         mediaAttachment.setHash(fileHash);
         mediaAttachment.setMediaType(type);
+        mediaAttachment.setUploadedAt(LocalDateTime.now());
+        mediaAttachment.setEvidenceStatus(EvidenceStatus.PENDING_VERIFICATION);
         MediaAttachment savedMediaAttachment = mediaAttachments.save(mediaAttachment);
+        report.getMediaAttachments().add(savedMediaAttachment);
+        reports.save(report);
         return mediaAttachmentMapper.mapToDto(savedMediaAttachment);
     }
+
+    @Override
+    public ResponderUnit findNearestResponder(Agency agency, double incidentLatitude, double incidentLongitude){
+        return geoCodingService.findNearestResponderId(agency.getId(), incidentLatitude, incidentLongitude)
+                .flatMap(responderUnits::findById)
+                .orElse(null);
+
+//        List<ResponderUnit> responderUnitList = agency.getResponderUnits();
+//        ResponderUnit nearestResponder = null;
+//        double minDistance = Double.MAX_VALUE;
+//        for(ResponderUnit responderUnit : responderUnitList){
+//            if(!responderUnit.isActive()){
+//                continue;
+//            }
+//            if(responderUnit.getBaseLatitude() == null || responderUnit.getBaseLongitude() == null){
+//                continue;
+//            }
+//            double distance = haversineDistance(incidentLatitude,incidentLongitude,
+//                    responderUnit.getBaseLatitude(),responderUnit.getBaseLongitude());
+//            if(distance < minDistance){
+//                minDistance = distance;
+//                nearestResponder = responderUnit;
+//            }
+//        }
+//        return nearestResponder;
+    }
+
 
     private void calculatePriorityAndDistance(Report report, boolean isHappeningNow) {
         if(report.getDeviceLatitude() == null || report.getDeviceLongitude() == null){
@@ -141,6 +184,14 @@ public class ReportServicesImpl implements ReportServices {
             return "AUDIO";
         }
         return "DOCUMENT";
+    }
+
+    private Report findReportById(String reportId){
+        return reports.findById(reportId)
+                .orElseThrow(()->{
+                    log.error("Report not found");
+                    return new ReportNotFoundException("Report not found.");
+                });
     }
 
 }

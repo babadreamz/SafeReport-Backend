@@ -5,5 +5,6 @@ public enum ReportStatus {
     IN_REVIEW,
     VERIFIED,
     FALSE_ALARM,
-    RESOLVED
+    RESOLVED,
+    UNASSIGNED
 }

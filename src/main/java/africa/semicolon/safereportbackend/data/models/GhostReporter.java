@@ -12,4 +12,5 @@ public class GhostReporter {
     private String id;
     private String deviceSignatureHash;
     private String recoveryPhraseHash;
+    private boolean isDeleted;
 }

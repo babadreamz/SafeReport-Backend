@@ -22,7 +22,7 @@ import java.util.Optional;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-public class ReportServiceTest {
+public class AttachMediaToReportTest {
     @Mock private MediaStorageService mediaStorageService;
     @Mock private MediaAttachments mediaAttachments;
     @Mock private Reports reports;
