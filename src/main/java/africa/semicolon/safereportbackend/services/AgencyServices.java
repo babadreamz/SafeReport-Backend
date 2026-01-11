@@ -14,6 +14,7 @@ public interface AgencyServices {
     AgencyLoginResponse login(LoginRequest request);
     String logout(String authHeader);
     ResponderResponse createResponderUnit(String agencyId, ResponderRequest request);
+    List<AgencyResponse> findAllAgencies();
     List<ReportSummary> getUnassignedReports(String agencyId);
     ReportResponse manuallyAssignReport(String reportId, String responderUnitId);
     void transferReportToAnotherAgency(String reportId, String targetAgencyId);

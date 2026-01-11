@@ -23,9 +23,12 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static africa.semicolon.safereportbackend.utils.mappers.AgencyModelMapper.*;
@@ -58,6 +61,7 @@ public class AgencyServicesImpl implements AgencyServices {
     private final TokenBlackList tokenBlackList;
 
     @Override
+    @CacheEvict(value = "agenciesList", allEntries = true)
     public AgencyResponse createAgency(AgencyRequest request) {
         Agency agency = mapToAgency(request);
         agency.setPassword(passwordEncoder.encode(agency.getPassword()));
@@ -109,6 +113,20 @@ public class AgencyServicesImpl implements AgencyServices {
                 responderUnit.getBaseLongitude()
         );
         return mapToResponderResponse(savedResponderUnit);
+    }
+
+    @Override
+    @Cacheable(value = "agenciesList")
+    public List<AgencyResponse> findAllAgencies() {
+        List<Agency> agencyList =  agencies.findAll()
+                .stream()
+                .toList();
+        List<AgencyResponse> agenciesList = new ArrayList<>();
+        for (Agency agency : agencyList) {
+            AgencyResponse agencyResponse = mapToAgencyResponse(agency);
+            agenciesList.add(agencyResponse);
+        }
+        return agenciesList;
     }
 
     @Override

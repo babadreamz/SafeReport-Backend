@@ -13,4 +13,6 @@ public interface Agencies extends JpaRepository<Agency,String> {
     @Query("SELECT agency FROM Agency agency LEFT JOIN FETCH agency.responderUnits WHERE agency.id = :id")
     Optional<Agency> findByIdWithResponderUnit(@Param("id") String agencyId);
     Optional<Agency> findByUsername(String username);
+
+    Optional<Agency> findByName(String name);
 }

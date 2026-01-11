@@ -132,7 +132,7 @@ class ReportingServicesTest {
         reportRequest.setIncidentLongitude(3.3711);
         reportRequest.setIncidentType("ELECTRICITY Vandalism");
         reportRequest.setHappeningNow(true);
-        reportRequest.setAgencyId(agencyResponse.getId());
+        reportRequest.setAgencyName(agencyResponse.getName());
         reportRequest.setLocationSource(LocationSource.GPS_AUTO);
         return reportRequest;
     }
@@ -174,7 +174,7 @@ class ReportingServicesTest {
         reportRequest.setIncidentLongitude( 3.3792);
         reportRequest.setIncidentType("ELECTRICITY Vandalism");
         reportRequest.setHappeningNow(true);
-        reportRequest.setAgencyId(agencyResponse.getId());
+        reportRequest.setAgencyName(agencyResponse.getName());
         reportRequest.setLocationSource(LocationSource.GPS_AUTO);
         ReportResponse reportResponse = reportServices.submitReport(deviceSignature, reportRequest);
         assertNotNull(reportResponse);
@@ -187,7 +187,7 @@ class ReportingServicesTest {
         reportRequest2.setIncidentLongitude( 12.3837);
         reportRequest2.setIncidentType("ELECTRICITY Vandalism");
         reportRequest2.setHappeningNow(true);
-        reportRequest2.setAgencyId(agencyResponse.getId());
+        reportRequest2.setAgencyName(agencyResponse.getName());
         reportRequest2.setLocationSource(LocationSource.GPS_AUTO);
         ReportResponse reportResponse2 = reportServices.submitReport(deviceSignature, reportRequest2);
         assertNotNull(reportResponse2);
@@ -304,7 +304,7 @@ class ReportingServicesTest {
         reportRequest.setIncidentLongitude(3.3711);
         reportRequest.setIncidentType("Fire Outbreak");
         reportRequest.setHappeningNow(true);
-        reportRequest.setAgencyId(npfResponse.getId());
+        reportRequest.setAgencyName(npfResponse.getName());
         reportRequest.setLocationSource(LocationSource.GPS_AUTO);
         ReportResponse reportResponse = reportServices.submitReport(deviceSignature, reportRequest);
         assertNotNull(reportResponse);
@@ -447,7 +447,7 @@ class ReportingServicesTest {
     }
     @Test
     void testThatErrorIsThrownWhenAnAgencyTriesToAccessReportsThatDontBelongToThem(){
-        String deviceSignature = "test-device02";
+        String deviceSignature = "test-device2";
         GhostReporterResponse ghostResponse = ghostIdentityServices.createIdentity(deviceSignature);
         assertNotNull(ghostResponse);
 //First Agency: Naija Police
@@ -495,6 +495,9 @@ class ReportingServicesTest {
         assertNotNull(reportResponse);
 
         assertThrows(SecurityException.class,()->responderServices.getReportDetails(reportResponse.getReportId(),npfResponderResponse.getId()));
+
+        List<AgencyResponse> agencyResponses = agencyServicesImpl.findAllAgencies();
+        assertNotNull(agencyResponses);
     }
 
 }

@@ -47,6 +47,7 @@ public class SecurityConfigs {
                         .requestMatchers("/api/agency/new").permitAll()
                         .requestMatchers("/api/agency/login").permitAll()
                         .requestMatchers("/api/responder/login").permitAll()
+                        .requestMatchers("/api/agency/agencies").permitAll()
                         .requestMatchers("/api/agency/transfer/**").hasAnyRole("AGENCY","RESPONDER")
                         .requestMatchers("/api/agency/**").hasRole("AGENCY")
                         .requestMatchers("/api/responder/**").hasRole("RESPONDER")
