@@ -56,14 +56,18 @@ public class AgencyController {
     public void transferReportToAnotherAgency(@PathVariable String reportId,@PathVariable String targetAgencyId){
         agencyServices.transferReportToAnotherAgency(reportId,targetAgencyId);
     }
-    @GetMapping("unit/all")
+    @GetMapping("/unit/all")
     public List<ResponderUnitDto> getAllResponderUnits(@RequestParam String agencyId){
         return agencyServices.getAllResponderUnits(agencyId);
     }
-    @PatchMapping("unit/toggle")
+    @PatchMapping("/unit/toggle")
     public void toggleResponderUnitStatus(@RequestParam String agencyId,
                                           @RequestParam String responderUnitId,
                                           @RequestParam boolean isActive){
         agencyServices.toggleResponderUnitStatus(agencyId, responderUnitId, isActive);
+    }
+    @GetMapping("/agencies")
+    public List<AgencyResponse> findAllAgencies(){
+        return agencyServices.findAllAgencies();
     }
 }

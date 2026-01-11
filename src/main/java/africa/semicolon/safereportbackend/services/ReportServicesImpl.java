@@ -53,7 +53,7 @@ public class ReportServicesImpl implements ReportServices {
         }
         GhostReporter reporter = ghostReporters.findByDeviceSignatureHash(hashedDeviceSignature)
                 .orElseThrow(()-> new GhostReporterNotFoundException("Identity not found. Please register first."));
-        Agency agency = agencies.findById(request.getAgencyId()).orElseThrow(()-> new AgencyNotFoundException("Invalid agency id."));
+        Agency agency = agencies.findByName(request.getAgencyName()).orElseThrow(()-> new AgencyNotFoundException("Invalid agency id."));
 
         Report report = mapToReport(request);
         report.setGhostReporterId(reporter.getId());

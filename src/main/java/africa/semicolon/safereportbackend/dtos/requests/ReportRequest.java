@@ -16,5 +16,5 @@ public class ReportRequest {
     private Double incidentLatitude;
     private Double incidentLongitude;
     private LocationSource locationSource;
-    private String agencyId;
+    private String agencyName;
 }
