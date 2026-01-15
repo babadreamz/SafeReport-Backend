@@ -41,7 +41,7 @@ public class SecurityConfigs {
                         session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authenticationProvider(authenticationProvider())
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(HttpMethod.OPTIONS,"**").permitAll()
+                        .requestMatchers(HttpMethod.OPTIONS,"/**").permitAll()
                         .requestMatchers("/api/report/**").permitAll()
                         .requestMatchers("/api/identity/**").permitAll()
                         .requestMatchers("/api/agency/new").permitAll()
