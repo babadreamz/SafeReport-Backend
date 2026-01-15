@@ -17,4 +17,5 @@ public class ReportSummary implements Serializable {
     private String state;
     private ReportStatus reportStatus;
     private String responderUnitId;
+    private String ghostReporterId;
 }

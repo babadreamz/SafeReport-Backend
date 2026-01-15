@@ -6,4 +6,4 @@ COPY target/*.jar app.jar
 
 EXPOSE 2000
 
-ENTRYPOINT ["java", "-jar","app.jar"]
+ENTRYPOINT ["java","-Xmx350m","-Xss512k", "-jar","app.jar"]

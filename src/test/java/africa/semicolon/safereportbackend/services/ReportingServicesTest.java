@@ -438,6 +438,7 @@ class ReportingServicesTest {
          assertNotNull(reportDetails);
          assertEquals(reportResponse.getResponderUnitId(),reportDetails.getResponderUnitId());
          assertNotNull(reportDetails.getResponderUnitId());
+         assertEquals(reportDetails.getGhostReporterId(),foundReporter.get().getId());
 
          ReportSummary reportSummary = responderServices.updateReportStatus(reportResponse.getReportId(),ReportStatus.RESOLVED,fireResponderResponse.getId());
          assertNotNull(reportSummary);
