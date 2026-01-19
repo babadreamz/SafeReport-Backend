@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.web3j.crypto.MnemonicUtils;
 import java.security.SecureRandom;
+import java.util.Optional;
 
 
 @Slf4j
@@ -31,8 +32,9 @@ public class GhostIdentityServicesImpl implements GhostIdentityServices {
 
     @Override
     public GhostReporterResponse createIdentity(String deviceSignature) {
-
         String deviceSignatureHash = anonymityServices.hashSignature(deviceSignature);
+        Optional<GhostReporter> existingReporter = ghostReporters.findByDeviceSignatureHash(deviceSignatureHash);
+        existingReporter.ifPresent(ghostReporters::delete);
         anonymityServices.checkSpam(deviceSignatureHash);
         String recoveryPhrase = generateRecoveryCodes();
         String hashedRecoveryPhrase = anonymityServices.hashSignature(recoveryPhrase);

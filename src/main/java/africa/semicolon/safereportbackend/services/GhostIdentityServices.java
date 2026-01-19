@@ -7,5 +7,4 @@ import africa.semicolon.safereportbackend.dtos.responses.GhostReporterResponse;
 public interface GhostIdentityServices {
     GhostReporterResponse createIdentity(String deviceSignature);
     GhostReporterDto recoverAccount(RecoveryRequest recoveryRequest, String deviceSignature);
-
 }
