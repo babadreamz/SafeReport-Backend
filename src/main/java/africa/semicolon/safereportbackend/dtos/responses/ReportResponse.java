@@ -19,4 +19,5 @@ public class ReportResponse {
     private String message;
     private String ghostReporterId;
     private String responderUnitId;
+    private boolean publicReport;
 }

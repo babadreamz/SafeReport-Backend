@@ -19,6 +19,8 @@ public class ReportMapper {
         report.setIncidentLatitude(request.getIncidentLatitude());
         report.setIncidentLongitude(request.getIncidentLongitude());
         report.setLocationSource(request.getLocationSource());
+        report.setPublicReport(request.isPublicReport());
+        report.setDeleted(false);
         return report;
     }
     public static ReportResponse mapToResponse(Report report) {
@@ -31,6 +33,7 @@ public class ReportMapper {
         response.setResolvedAddress(report.getStreet() + ", " + report.getLga());
         response.setResponderUnitId(report.getResponderUnitId());
         response.setMessage("Report received successfully.");
+        response.setPublicReport(report.isPublicReport());
         return response;
     }
 }
