@@ -12,4 +12,6 @@ public interface Reports extends JpaRepository<Report,String> {
             ReportStatus status
     );
     List<Report> findByAgencyIdAndReportStatusOrderByCreatedTimestampDesc(String agencyId, ReportStatus reportStatus);
+
+    List<Report> findByPublicReportTrue();
 }

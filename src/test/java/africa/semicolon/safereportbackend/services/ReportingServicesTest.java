@@ -198,6 +198,66 @@ class ReportingServicesTest {
         assertEquals(ReportStatus.UNASSIGNED, reportSummaries.getLast().getReportStatus());
     }
     @Test
+    void testThatPublicReportsCanBeAccessed(){
+        String deviceSignature = "test-Device-07";
+        GhostReporterResponse ghostResponse = ghostIdentityServices.createIdentity(deviceSignature);
+        assertNotNull(ghostResponse);
+        Optional<GhostReporter> foundReporter = ghostIdentityServices.getGhostReporters().findById(ghostResponse.getId());
+        assertTrue(foundReporter.isPresent());
+
+        AgencyRequest agencyRequest = new AgencyRequest();
+        agencyRequest.setName("Naija Police");
+        agencyRequest.setEmail("naijapolice@gmail.com");
+        agencyRequest.setPassword("1StrongPassword!");
+        agencyRequest.setUsername("NaijaPolice01");
+        AgencyResponse agencyResponse = agencyServicesImpl.createAgency(agencyRequest);
+        assertNotNull(agencyResponse);
+
+        ResponderRequest responderRequest = new ResponderRequest();
+        responderRequest.setName("NPF-Responder-01");
+        responderRequest.setPassword("1StrongPassword!");
+        responderRequest.setAgencyName(agencyResponse.getName());
+        responderRequest.setBaseLatitude(6.524379);
+        responderRequest.setBaseLongitude(3.379206);
+        responderRequest.setUsername("NPFResponder01");
+        responderRequest.setContactNumber("07034567890");
+        ResponderResponse responderResponse = agencyServicesImpl.createResponderUnit(agencyResponse.getId(), responderRequest);
+        assertNotNull(responderResponse);
+        Optional<ResponderUnit> foundUnit = responderUnits.findByUsername(responderResponse.getUsername());
+        assertTrue(foundUnit.isPresent());
+
+        ReportRequest reportRequest = new ReportRequest();
+        reportRequest.setDescription("Electricity Vandalism");
+        reportRequest.setDeviceLatitude(15.5323);
+        reportRequest.setDeviceLongitude( 3.3792);
+        reportRequest.setIncidentLatitude(15.5323);
+        reportRequest.setIncidentLongitude( 3.3792);
+        reportRequest.setIncidentType("ELECTRICITY Vandalism");
+        reportRequest.setHappeningNow(true);
+        reportRequest.setAgencyName(agencyResponse.getName());
+        reportRequest.setLocationSource(LocationSource.GPS_AUTO);
+        reportRequest.setPublicReport(true);
+        ReportResponse reportResponse = reportServices.submitReport(deviceSignature, reportRequest);
+        assertNotNull(reportResponse);
+
+        ReportRequest reportRequest2 = new ReportRequest();
+        reportRequest2.setDescription("Electricity Vandalism");
+        reportRequest2.setDeviceLatitude(6.4503);
+        reportRequest2.setDeviceLongitude( 12.3837);
+        reportRequest2.setIncidentLatitude(6.4503);
+        reportRequest2.setIncidentLongitude( 12.3837);
+        reportRequest2.setIncidentType("ELECTRICITY Vandalism");
+        reportRequest2.setHappeningNow(true);
+        reportRequest2.setAgencyName(agencyResponse.getName());
+        reportRequest2.setLocationSource(LocationSource.GPS_AUTO);
+        reportRequest2.setPublicReport(false);
+        ReportResponse reportResponse2 = reportServices.submitReport(deviceSignature, reportRequest2);
+        assertNotNull(reportResponse2);
+
+        List<ReportSummary> reportSummaryList = reportServices.findPublicReports();
+        assertEquals(1,reportSummaryList.size());
+    }
+    @Test
     void testThatReportsCanBeManuallyAssignedToResponderByAgency(){
         String deviceSignature = "testDevice-08";
         GhostReporterResponse ghostResponse = ghostIdentityServices.createIdentity(deviceSignature);

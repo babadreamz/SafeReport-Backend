@@ -17,4 +17,5 @@ public class ReportRequest {
     private Double incidentLongitude;
     private LocationSource locationSource;
     private String agencyName;
+    private boolean publicReport;
 }

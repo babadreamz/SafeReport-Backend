@@ -36,4 +36,5 @@ public class Report {
     @OneToMany(mappedBy = "report", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<MediaAttachment> mediaAttachments = new ArrayList<>();
     private boolean isDeleted;
+    private boolean publicReport;
 }

@@ -2,6 +2,7 @@ package africa.semicolon.safereportbackend.controllers;
 
 import africa.semicolon.safereportbackend.data.models.ReportStatus;
 import africa.semicolon.safereportbackend.dtos.modeldtos.MediaAttachmentDto;
+import africa.semicolon.safereportbackend.dtos.modeldtos.ReportSummary;
 import africa.semicolon.safereportbackend.dtos.requests.ReportRequest;
 import africa.semicolon.safereportbackend.dtos.responses.ReportResponse;
 import africa.semicolon.safereportbackend.services.ReportServices;
@@ -9,6 +10,8 @@ import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/report")
@@ -29,5 +32,9 @@ public class ReportController {
     @PostMapping("/media/attach/{reportId}")
     public ResponseEntity<MediaAttachmentDto> attachMediaToReport(@PathVariable String reportId, @RequestParam MultipartFile file){
         return ResponseEntity.ok(reportServices.attachMediaToReport(reportId,file));
+    }
+    @GetMapping("/public")
+    public List<ReportSummary> publicReports(){
+        return reportServices.findPublicReports();
     }
 }

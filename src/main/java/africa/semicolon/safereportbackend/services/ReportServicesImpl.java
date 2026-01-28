@@ -3,17 +3,22 @@ package africa.semicolon.safereportbackend.services;
 import africa.semicolon.safereportbackend.data.models.*;
 import africa.semicolon.safereportbackend.data.repositories.*;
 import africa.semicolon.safereportbackend.dtos.modeldtos.MediaAttachmentDto;
+import africa.semicolon.safereportbackend.dtos.modeldtos.ReportSummary;
 import africa.semicolon.safereportbackend.dtos.requests.ReportRequest;
 import africa.semicolon.safereportbackend.dtos.responses.ReportResponse;
 import africa.semicolon.safereportbackend.exceptions.*;
+import africa.semicolon.safereportbackend.utils.mappers.MapReport;
 import africa.semicolon.safereportbackend.utils.mappers.MediaAttachmentMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -44,8 +49,11 @@ public class ReportServicesImpl implements ReportServices {
     private Agencies agencies;
     @Autowired
     private ResponderServices responderServices;
+    @Autowired
+    private MapReport reportSummaryMapper;
 
     @Override
+    @CacheEvict(value = "publicReports", allEntries = true,condition = "#request.publicReport == true")
     public ReportResponse submitReport(String deviceSignature, ReportRequest request) {
         String hashedDeviceSignature = anonymityServices.hashSignature(deviceSignature);
         if(!anonymityServices.isAllowedToPost(hashedDeviceSignature)){
@@ -60,7 +68,6 @@ public class ReportServicesImpl implements ReportServices {
         report.setAgencyId(agency.getId());
 
         calculatePriorityAndDistance(report, request.isHappeningNow());
-
         try{
             Map<String, String> address = geoCodingService.getAddressDetails(
                     request.getIncidentLatitude(),request.getIncidentLongitude());
@@ -142,6 +149,14 @@ public class ReportServicesImpl implements ReportServices {
 //        return nearestResponder;
     }
 
+    @Override
+    @Cacheable(value = "publicReports")
+    public List<ReportSummary> findPublicReports() {
+        return reports.findByPublicReportTrue()
+                .stream()
+                .map(reportSummaryMapper::mapToSummary)
+                .toList();
+    }
 
     private void calculatePriorityAndDistance(Report report, boolean isHappeningNow) {
         if(report.getDeviceLatitude() == null || report.getDeviceLongitude() == null){
